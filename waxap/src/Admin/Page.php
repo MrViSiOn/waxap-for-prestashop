@@ -63,7 +63,9 @@ final class Page
     {
         $notice = $this->processForms();
 
-        $current = (string) Tools::getValue('tab', 'connection');
+        // OJO: no usar el nombre de parámetro 'tab' — está reservado por el admin
+        // legacy de PrestaShop (enrutado de controladores) y no llega a getContent().
+        $current = (string) Tools::getValue('waxap_tab', 'connection');
         if (!array_key_exists($current, self::TABS)) {
             $current = 'connection';
         }
@@ -562,7 +564,7 @@ final class Page
     /** URL de una pestaña concreta. */
     private function tabUrl(string $slug): string
     {
-        return $this->configUrl() . '&tab=' . $slug;
+        return $this->configUrl() . '&waxap_tab=' . $slug;
     }
 
     /** Hace fetch de una plantilla admin del módulo. */

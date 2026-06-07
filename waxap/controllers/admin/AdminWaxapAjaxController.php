@@ -199,7 +199,7 @@ class AdminWaxapAjaxController extends ModuleAdminController
 
         $base = $this->context->link->getAdminLink('AdminModules', true, [], [
             'configure' => 'waxap',
-            'tab' => 'connection',
+            'waxap_tab' => 'connection',
         ]);
         $successUrl = $base . '&payment=success';
         $cancelUrl = $base . '&payment=cancelled';
@@ -254,7 +254,7 @@ class AdminWaxapAjaxController extends ModuleAdminController
     {
         $returnUrl = $this->context->link->getAdminLink('AdminModules', true, [], [
             'configure' => 'waxap',
-            'tab' => 'connection',
+            'waxap_tab' => 'connection',
         ]);
 
         try {
