@@ -156,6 +156,8 @@ final class Page
                 return $this->renderNotifications();
             case 'email':
                 return $this->renderEmail();
+            case 'history':
+                return $this->renderHistory();
             case 'connection':
             default:
                 return $this->renderConnection();
@@ -309,6 +311,42 @@ final class Page
         ]);
 
         return $this->fetch('tab-email.tpl');
+    }
+
+    /** Pestaña Historial: registro paginado de mensajes enviados. */
+    private function renderHistory(): string
+    {
+        $limit = 20;
+        $page = max(1, (int) Tools::getValue('paged', 1));
+        $offset = ($page - 1) * $limit;
+
+        $rows = [];
+        $total = 0;
+        $error = null;
+        try {
+            $log = (new WrapperClient())->getMessageLog($limit, $offset);
+            $rows = is_array($log['data'] ?? null) ? $log['data'] : [];
+            $total = (int) ($log['total'] ?? 0);
+        } catch (WrapperException $e) {
+            $error = $e->getMessage();
+        }
+
+        $totalPages = $limit > 0 ? (int) ceil($total / $limit) : 1;
+        $baseUrl = $this->tabUrl('history');
+
+        $this->context->smarty->assign([
+            'waxap_rows' => $rows,
+            'waxap_total' => $total,
+            'waxap_page' => $page,
+            'waxap_total_pages' => $totalPages,
+            'waxap_history_error' => $error,
+            'waxap_history_base_url' => $baseUrl,
+            'waxap_prev_url' => $baseUrl . '&paged=' . max(1, $page - 1),
+            'waxap_next_url' => $baseUrl . '&paged=' . min($totalPages, $page + 1),
+            'waxap_last_url' => $baseUrl . '&paged=' . $totalPages,
+        ]);
+
+        return $this->fetch('tab-history.tpl');
     }
 
     /* ===================================================================
