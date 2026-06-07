@@ -34,7 +34,7 @@ jobs:
         run: |
           set -euo pipefail
           # Versión declarada dentro del módulo
-          MODULE_VERSION="$(grep -oP "\$this->version\s*=\s*'\K[0-9]+\.[0-9]+\.[0-9]+" waxap/waxap.php | head -1)"
+          MODULE_VERSION="$(grep -oP -m1 "\$this->version\s*=\s*'\K[0-9]+\.[0-9]+\.[0-9]+" waxap/waxap.php || true)"
           if [ -z "${MODULE_VERSION}" ]; then
             echo "::error::No se pudo extraer \$this->version de waxap/waxap.php"
             exit 1
