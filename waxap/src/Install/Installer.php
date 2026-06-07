@@ -45,6 +45,8 @@ final class Installer
         'actionValidateOrder',
         // Botón wa.me en la página de confirmación de pedido (paridad shortcode WC).
         'displayOrderConfirmation',
+        // Aviso de actualización disponible en el back-office (DRAPPS-505).
+        'displayBackOfficeHeader',
     ];
 
     /**

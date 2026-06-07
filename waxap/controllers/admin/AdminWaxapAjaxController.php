@@ -20,6 +20,7 @@ if (!defined('_PS_VERSION_')) {
 
 use Waxap\Api\WrapperClient;
 use Waxap\Api\WrapperException;
+use Waxap\Service\Updater;
 use Waxap\Settings\Config;
 
 /**
@@ -326,6 +327,20 @@ class AdminWaxapAjaxController extends ModuleAdminController
             $this->ok();
         } catch (WrapperException $e) {
             $this->err($e->getMessage());
+        }
+    }
+
+    /* ===================================================================
+     *  AUTO-UPDATER (DRAPPS-505)
+     * =================================================================== */
+
+    /** Descarga y aplica la última release desde GitHub. */
+    public function ajaxProcessApplyUpdate(): void
+    {
+        if (Updater::downloadAndInstall()) {
+            $this->ok();
+        } else {
+            $this->err($this->l('No se pudo descargar o aplicar la actualización. Inténtalo más tarde.'));
         }
     }
 

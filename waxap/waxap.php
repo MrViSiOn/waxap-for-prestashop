@@ -44,6 +44,7 @@ use Waxap\Service\Idempotency;
 use Waxap\Service\OptIn;
 use Waxap\Service\PhoneNormalizer;
 use Waxap\Service\TemplateRenderer;
+use Waxap\Service\Updater;
 use Waxap\Settings\Config;
 
 /**
@@ -295,6 +296,36 @@ class Waxap extends Module
         $orderNumber = ($order instanceof Order) ? (string) $order->reference : null;
 
         return EmailButton::build($orderNumber);
+    }
+
+    /**
+     * Avisa en el back-office cuando hay una actualización disponible (DRAPPS-505).
+     *
+     * Solo en la página de configuración del propio módulo para no consultar GitHub en
+     * cada carga del back-office.
+     *
+     * @param array<string,mixed> $params
+     */
+    public function hookDisplayBackOfficeHeader(array $params): void
+    {
+        if ('AdminModules' !== (string) Tools::getValue('controller')
+            || 'waxap' !== (string) Tools::getValue('configure')) {
+            return;
+        }
+
+        if (!Updater::isUpdateAvailable($this->version)) {
+            return;
+        }
+
+        $latest = Updater::getLatestRelease();
+        $version = $latest['version'] ?? '';
+        if (null !== $this->context->controller) {
+            $this->context->controller->warnings[] = $this->trans(
+                'Hay una nueva versión de Waxap disponible (%v%). Puedes actualizar desde la pestaña Conexión.',
+                ['%v%' => $version],
+                'Modules.Waxap.Admin'
+            );
+        }
     }
 
     /** Acceso de conveniencia a la configuración del módulo. */

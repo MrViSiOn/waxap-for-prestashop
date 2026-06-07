@@ -8,6 +8,30 @@
  * @copyright Copyright (c) drappsinfo. Todos los derechos reservados.
  * @license   Propietaria — All rights reserved.
  *}
+{if isset($waxap_update) && $waxap_update}
+    <div class="waxap-notice-warning" style="display:flex;align-items:center;gap:12px;">
+        <span style="flex:1;">{l s='Nueva versión disponible: %v%' sprintf=['%v%' => $waxap_update.version] d='Modules.Waxap.Admin'}</span>
+        <button type="button" id="wan-update-btn" class="btn btn-default waxap-btn-primary">{l s='Actualizar ahora' d='Modules.Waxap.Admin'}</button>
+    </div>
+    <script>
+    (function () {
+        var btn = document.getElementById('wan-update-btn');
+        if (!btn) { return; }
+        btn.addEventListener('click', function () {
+            btn.disabled = true; btn.textContent = '…';
+            fetch('{$waxap_ajax_url|escape:'javascript':'UTF-8'}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ ajax: '1', action: 'ApplyUpdate' })
+            }).then(function (r) { return r.json(); }).then(function (d) {
+                if (d.success) { window.location.reload(); }
+                else { window.alert((d.data && d.data.message) ? d.data.message : 'Error'); btn.disabled = false; btn.textContent = 'Actualizar ahora'; }
+            }).catch(function () { window.alert('Error de conexión.'); btn.disabled = false; btn.textContent = 'Actualizar ahora'; });
+        });
+    }());
+    </script>
+{/if}
+
 {if $waxap_is_connected}
 
     <div class="waxap-section-header">

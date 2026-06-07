@@ -26,6 +26,7 @@ use Tools;
 use Validate;
 use Waxap\Api\WrapperClient;
 use Waxap\Api\WrapperException;
+use Waxap\Service\Updater;
 use Waxap\Settings\Config;
 
 /**
@@ -228,6 +229,7 @@ final class Page
             'waxap_payment_cancelled' => 'cancelled' === $paymentParam,
             'waxap_usage' => $this->connectionUsage($isConnected),
             'waxap_ajax_url' => $this->context->link->getAdminLink('AdminWaxapAjax'),
+            'waxap_update' => $this->updateBanner(),
             'waxap_phone_tab_url' => $this->tabUrl('phone'),
             'waxap_config_url' => $this->configUrl(),
         ]);
@@ -278,6 +280,21 @@ final class Page
             'is_active' => 'active' === $status,
             'is_suspended' => in_array($status, ['suspended', 'cancelled'], true),
         ];
+    }
+
+    /**
+     * Datos del banner de actualización disponible (DRAPPS-505).
+     *
+     * @return array{version:string}|null
+     */
+    private function updateBanner(): ?array
+    {
+        if (!Updater::isUpdateAvailable($this->module->version)) {
+            return null;
+        }
+        $latest = Updater::getLatestRelease();
+
+        return $latest ? ['version' => (string) $latest['version']] : null;
     }
 
     /** Pestaña Notificaciones: selector de estados de pedido (lectura dinámica de OrderState). */
