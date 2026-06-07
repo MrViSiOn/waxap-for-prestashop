@@ -84,7 +84,7 @@ class Waxap extends Module
      *
      * @param array<string,string> $parameters
      */
-    public function l(string $id, array $parameters = []): string
+    public function l10n(string $id, array $parameters = []): string
     {
         return $this->trans($id, $parameters, 'Modules.Waxap.Admin');
     }
