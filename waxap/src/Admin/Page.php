@@ -141,16 +141,21 @@ final class Page
         $states = [];
         foreach (OrderState::getOrderStates((int) $this->context->language->id) as $state) {
             $id = (string) $state['id_order_state'];
+            $template = Config::get('TEMPLATE_' . $id);
             $states[] = [
                 'id' => $id,
                 'label' => (string) $state['name'],
                 'color' => (string) ($state['color'] ?? '#6b7280'),
                 'enabled' => in_array($id, $enabled, true),
+                'template' => $template,
+                'has_content' => '' !== $template,
             ];
         }
 
         $this->context->smarty->assign([
             'waxap_states' => $states,
+            'waxap_country_code' => Config::get('PHONE_COUNTRY_CODE'),
+            'waxap_vars' => ['{nombre}', '{pedido}', '{estado}', '{total}', '{enlace}'],
             'waxap_config_url' => $this->configUrl(),
         ]);
 
@@ -204,7 +209,7 @@ final class Page
         return $this->warn($this->module->trans('Cuenta desconectada.', [], 'Modules.Waxap.Admin'));
     }
 
-    /** Guarda los estados de pedido a notificar. */
+    /** Guarda los estados de pedido a notificar, sus plantillas y el prefijo de país. */
     private function saveNotifications(): string
     {
         $validIds = array_map(
@@ -222,8 +227,22 @@ final class Page
                 }
             }
         }
-
         Config::set('NOTIFY_STATUSES', implode(',', $selected));
+
+        // Prefijo de país (solo dígitos). Por defecto 34 (España).
+        $countryCode = preg_replace('/\D/', '', (string) Tools::getValue('phone_country_code'));
+        Config::set('PHONE_COUNTRY_CODE', '' !== (string) $countryCode ? (string) $countryCode : '34');
+
+        // Plantilla de mensaje por cada estado.
+        $templates = Tools::getValue('waxap_templates');
+        if (is_array($templates)) {
+            foreach ($validIds as $id) {
+                $tpl = isset($templates[$id]) ? (string) $templates[$id] : '';
+                // Limpiamos etiquetas pero conservamos saltos de línea y variables {…}.
+                $tpl = strip_tags($tpl);
+                Config::set('TEMPLATE_' . $id, $tpl);
+            }
+        }
 
         return $this->ok($this->module->trans('Configuración guardada.', [], 'Modules.Waxap.Admin'));
     }
