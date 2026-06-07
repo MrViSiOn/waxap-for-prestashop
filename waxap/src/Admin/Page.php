@@ -215,6 +215,7 @@ final class Page
             'waxap_ob_step' => '' !== $tenantId ? '2' : '1',
             'waxap_payment_cancelled' => 'cancelled' === $paymentParam,
             'waxap_usage' => $this->connectionUsage($isConnected),
+            'waxap_ajax_url' => $this->context->link->getAdminLink('AdminWaxapAjax'),
             'waxap_phone_tab_url' => $this->tabUrl('phone'),
             'waxap_config_url' => $this->configUrl(),
         ]);
@@ -225,13 +226,46 @@ final class Page
     /**
      * Devuelve los datos de uso/suscripción para la tarjeta de la pestaña Conexión.
      *
-     * El cuerpo completo (llamada a getUsage + formato) se implementa en DRAPPS-500.
-     *
-     * @return array<string,mixed>|null
+     * @return array<string,mixed>|null Null si no está conectado o la API no responde.
      */
     private function connectionUsage(bool $isConnected): ?array
     {
-        return null;
+        if (!$isConnected) {
+            return null;
+        }
+
+        try {
+            $usage = (new WrapperClient())->getUsage();
+        } catch (WrapperException $e) {
+            return null;
+        }
+
+        $used = (int) ($usage['used'] ?? 0);
+        $quota = (int) ($usage['quota'] ?? 100);
+        $status = (string) ($usage['status'] ?? 'active');
+        $pct = $quota > 0 ? min(100, (int) round($used / $quota * 100)) : 0;
+        $remaining = $quota - $used;
+        $warning = $remaining < 20;
+
+        $resetLabel = '';
+        if (!empty($usage['quotaResetAt'])) {
+            $ts = strtotime((string) $usage['quotaResetAt']);
+            if (false !== $ts) {
+                $resetLabel = date('d/m/Y', $ts);
+            }
+        }
+
+        return [
+            'used' => $used,
+            'quota' => $quota,
+            'status' => $status,
+            'pct' => $pct,
+            'remaining' => $remaining,
+            'warning' => $warning,
+            'reset_label' => $resetLabel,
+            'is_active' => 'active' === $status,
+            'is_suspended' => in_array($status, ['suspended', 'cancelled'], true),
+        ];
     }
 
     /** Pestaña Notificaciones: selector de estados de pedido (lectura dinámica de OrderState). */
