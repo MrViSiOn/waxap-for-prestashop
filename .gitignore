@@ -1,0 +1,26 @@
+# Dependencias
+/waxap/vendor/
+node_modules/
+
+# Artefactos de build / distribución
+*.zip
+/dist/
+
+# Caché y logs de PrestaShop (por si se desarrolla dentro de una instalación)
+/waxap/cache/
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores / IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# Herramientas PHP
+.phpunit.result.cache
+.php-cs-fixer.cache
+.phpcs-cache

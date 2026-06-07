@@ -1,0 +1,24 @@
+{
+    "name": "drappsinfo/waxap-for-prestashop",
+    "description": "Waxap — notificaciones WhatsApp para PrestaShop 8",
+    "type": "prestashop-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "drappsinfo",
+            "homepage": "https://waxap.shop"
+        }
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Waxap\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "prepend-autoloader": false
+    }
+}
