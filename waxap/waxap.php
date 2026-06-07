@@ -241,8 +241,29 @@ class Waxap extends Module
      */
     public function hookDisplayPaymentTop(array $params): string
     {
-        // Implementado en DRAPPS-498.
-        return '';
+        if (!Config::isConnected() || !Config::hasSession()) {
+            return '';
+        }
+
+        $label = $this->trans(
+            'Quiero recibir actualizaciones de mi pedido por WhatsApp',
+            [],
+            'Modules.Waxap.Shop'
+        );
+
+        // Checkbox marcado por defecto. Un pequeño script sincroniza la preferencia en una
+        // cookie que leemos en hookActionValidateOrder (el submit de pago no arrastra el campo).
+        return '<div class="waxap-checkout-consent" style="margin:14px 0;padding:12px 14px;'
+            . 'border:1px solid #b5eace;background:#edfaf3;border-radius:6px;">'
+            . '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;">'
+            . '<input type="checkbox" id="waxap-opt-in" name="waxap_opt_in" value="1" checked>'
+            . '<span>' . htmlspecialchars($label, ENT_QUOTES) . '</span>'
+            . '</label></div>'
+            . '<script>(function(){'
+            . 'function setC(v){document.cookie="waxapOptIn="+v+"; path=/; max-age=3600; SameSite=Lax";}'
+            . 'var c=document.getElementById("waxap-opt-in"); if(!c){return;} setC(c.checked?"1":"0");'
+            . 'c.addEventListener("change",function(){setC(c.checked?"1":"0");});'
+            . '})();</script>';
     }
 
     /**
@@ -252,7 +273,15 @@ class Waxap extends Module
      */
     public function hookActionValidateOrder(array $params): void
     {
-        // Implementado en DRAPPS-498.
+        $order = $params['order'] ?? null;
+        if (!$order instanceof Order || (int) $order->id <= 0) {
+            return;
+        }
+
+        // Sin cookie → opt-in por defecto (paridad con WooCommerce).
+        $optIn = !isset($_COOKIE['waxapOptIn']) || '1' === (string) $_COOKIE['waxapOptIn'];
+
+        OptIn::save((int) $order->id, $optIn);
     }
 
     /**
