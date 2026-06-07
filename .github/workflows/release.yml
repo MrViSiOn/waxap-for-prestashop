@@ -33,8 +33,9 @@ jobs:
         id: ver
         run: |
           set -euo pipefail
-          # Versión declarada dentro del módulo
-          MODULE_VERSION="$(grep -oP -m1 "\$this->version\s*=\s*'\K[0-9]+\.[0-9]+\.[0-9]+" waxap/waxap.php || true)"
+          # Versión declarada dentro del módulo ($this->version = 'X.Y.Z').
+          # Patrón sin '$' literal: en PCRE '$' es ancla de fin de línea y no matchearía.
+          MODULE_VERSION="$(grep -oP -m1 "version\s*=\s*'\K[0-9]+\.[0-9]+\.[0-9]+" waxap/waxap.php || true)"
           if [ -z "${MODULE_VERSION}" ]; then
             echo "::error::No se pudo extraer \$this->version de waxap/waxap.php"
             exit 1
