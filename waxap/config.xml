@@ -2,7 +2,7 @@
 <module>
   <name>waxap</name>
   <displayName><![CDATA[Waxap]]></displayName>
-  <version><![CDATA[0.1.1]]></version>
+  <version><![CDATA[0.2.0]]></version>
   <description><![CDATA[Notificaciones WhatsApp para tu tienda PrestaShop.]]></description>
   <author><![CDATA[drappsinfo]]></author>
   <tab><![CDATA[administration]]></tab>
