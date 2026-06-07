@@ -39,6 +39,7 @@ use Waxap\Admin\Page;
 use Waxap\Api\WrapperClient;
 use Waxap\Api\WrapperException;
 use Waxap\Install\Installer;
+use Waxap\Service\EmailButton;
 use Waxap\Service\Idempotency;
 use Waxap\Service\OptIn;
 use Waxap\Service\PhoneNormalizer;
@@ -204,7 +205,33 @@ class Waxap extends Module
      */
     public function hookActionEmailAddBeforeContent(array $params): void
     {
-        // Implementado en DRAPPS-497.
+        // Solo emails de pedido (lista blanca) y solo el cuerpo HTML.
+        $template = (string) ($params['template'] ?? '');
+        if (!in_array($template, EmailButton::ORDER_EMAIL_TEMPLATES, true)) {
+            return;
+        }
+        if (!isset($params['template_html'])) {
+            return;
+        }
+
+        // Intentamos extraer la referencia del pedido de las variables de la plantilla.
+        $orderNumber = null;
+        $vars = $params['template_vars'] ?? [];
+        if (is_array($vars)) {
+            if (!empty($vars['{order_name}'])) {
+                $orderNumber = (string) $vars['{order_name}'];
+            } elseif (!empty($vars['{id_order}'])) {
+                $orderNumber = (string) $vars['{id_order}'];
+            }
+        }
+
+        $button = EmailButton::build($orderNumber);
+        if ('' === $button) {
+            return;
+        }
+
+        // El elemento template_html del array es una referencia al cuerpo real del email.
+        $params['template_html'] .= $button;
     }
 
     /**
@@ -235,8 +262,10 @@ class Waxap extends Module
      */
     public function hookDisplayOrderConfirmation(array $params): string
     {
-        // Implementado en DRAPPS-497.
-        return '';
+        $order = $params['order'] ?? ($params['objOrder'] ?? null);
+        $orderNumber = ($order instanceof Order) ? (string) $order->reference : null;
+
+        return EmailButton::build($orderNumber);
     }
 
     /** Acceso de conveniencia a la configuración del módulo. */

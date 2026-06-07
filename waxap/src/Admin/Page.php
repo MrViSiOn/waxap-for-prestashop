@@ -142,6 +142,8 @@ final class Page
                 return $this->renderPhone();
             case 'notifications':
                 return $this->renderNotifications();
+            case 'email':
+                return $this->renderEmail();
             case 'connection':
             default:
                 return $this->renderConnection();
@@ -230,6 +232,21 @@ final class Page
         return $this->fetch('tab-notifications.tpl');
     }
 
+    /** Pestaña Email: botón wa.me en los emails transaccionales. */
+    private function renderEmail(): string
+    {
+        $this->context->smarty->assign([
+            'waxap_email_enabled' => '1' === Config::get('EMAIL_BTN_ENABLED'),
+            'waxap_email_text' => Config::get('EMAIL_BTN_TEXT'),
+            'waxap_email_prefill' => Config::get('EMAIL_BTN_PREFILL'),
+            'waxap_has_phone' => '' !== Config::get('PHONE_NUMBER'),
+            'waxap_phone_tab_url' => $this->tabUrl('phone'),
+            'waxap_config_url' => $this->configUrl(),
+        ]);
+
+        return $this->fetch('tab-email.tpl');
+    }
+
     /* ===================================================================
      *  PROCESADO DE FORMULARIOS
      *
@@ -249,8 +266,21 @@ final class Page
         if (Tools::isSubmit('submitWaxapNotifications')) {
             return $this->saveNotifications();
         }
+        if (Tools::isSubmit('submitWaxapEmail')) {
+            return $this->saveEmail();
+        }
 
         return '';
+    }
+
+    /** Guarda la configuración del botón de email. */
+    private function saveEmail(): string
+    {
+        Config::set('EMAIL_BTN_ENABLED', Tools::getValue('email_button_enabled') ? '1' : '0');
+        Config::set('EMAIL_BTN_TEXT', strip_tags((string) Tools::getValue('email_button_text')));
+        Config::set('EMAIL_BTN_PREFILL', strip_tags((string) Tools::getValue('email_button_prefill')));
+
+        return $this->ok($this->module->trans('Configuración guardada.', [], 'Modules.Waxap.Admin'));
     }
 
     /** Guarda las credenciales de conexión introducidas manualmente. */
