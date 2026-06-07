@@ -102,6 +102,18 @@ final class Page
                 ],
             ]);
         }
+
+        // Wizard de onboarding: solo en la pestaña Conexión cuando no está conectado.
+        if ('connection' === $current && !Config::isConnected()) {
+            $controller->addJS($base . 'views/js/admin-onboarding.js?v=' . $ver);
+            \Media::addJsDef([
+                'waxapOnboarding' => [
+                    'ajaxUrl' => $ajaxUrl,
+                    'step' => '' !== Config::get('TENANT_ID') ? '2' : '1',
+                    'paymentReturned' => 'success' === (string) Tools::getValue('payment') ? '1' : '0',
+                ],
+            ]);
+        }
     }
 
     /* ===================================================================
@@ -192,16 +204,34 @@ final class Page
     {
         $isConnected = Config::isConnected();
 
+        $tenantId = Config::get('TENANT_ID');
+        $paymentParam = (string) Tools::getValue('payment');
+
         $this->context->smarty->assign([
             'waxap_is_connected' => $isConnected,
             'waxap_wrapper_url' => Config::get('WRAPPER_URL'),
             'waxap_api_key' => Config::get('API_KEY'),
-            'waxap_tenant_id' => Config::get('TENANT_ID'),
+            'waxap_tenant_id' => $tenantId,
+            'waxap_ob_step' => '' !== $tenantId ? '2' : '1',
+            'waxap_payment_cancelled' => 'cancelled' === $paymentParam,
+            'waxap_usage' => $this->connectionUsage($isConnected),
             'waxap_phone_tab_url' => $this->tabUrl('phone'),
             'waxap_config_url' => $this->configUrl(),
         ]);
 
         return $this->fetch('tab-connection.tpl');
+    }
+
+    /**
+     * Devuelve los datos de uso/suscripción para la tarjeta de la pestaña Conexión.
+     *
+     * El cuerpo completo (llamada a getUsage + formato) se implementa en DRAPPS-500.
+     *
+     * @return array<string,mixed>|null
+     */
+    private function connectionUsage(bool $isConnected): ?array
+    {
+        return null;
     }
 
     /** Pestaña Notificaciones: selector de estados de pedido (lectura dinámica de OrderState). */
@@ -269,8 +299,45 @@ final class Page
         if (Tools::isSubmit('submitWaxapEmail')) {
             return $this->saveEmail();
         }
+        if (Tools::isSubmit('submitWaxapLogin')) {
+            return $this->login();
+        }
+        if (Tools::isSubmit('submitWaxapCancelRegistration')) {
+            return $this->cancelRegistration();
+        }
 
         return '';
+    }
+
+    /** Inicia sesión con email y contraseña y guarda las credenciales del tenant. */
+    private function login(): string
+    {
+        $email = trim((string) Tools::getValue('email'));
+        $password = (string) Tools::getValue('password');
+
+        if ('' === $email || '' === $password) {
+            return $this->error($this->module->trans('Rellena todos los campos.', [], 'Modules.Waxap.Admin'));
+        }
+
+        try {
+            $result = (new WrapperClient())->login($email, $password);
+            Config::set('API_KEY', (string) ($result['apiKey'] ?? ''));
+            Config::set('TENANT_ID', (string) ($result['tenantId'] ?? ''));
+            Config::set('HMAC_SECRET', (string) ($result['hmacSecret'] ?? ''));
+
+            return $this->ok($this->module->trans('Sesión iniciada. Vincula ahora tu número WhatsApp.', [], 'Modules.Waxap.Admin'));
+        } catch (WrapperException $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    /** Cancela el registro en curso (borra el tenant para volver al login/registro). */
+    private function cancelRegistration(): string
+    {
+        Config::set('TENANT_ID', '');
+        Config::set('CLAIM_TOKEN', '');
+
+        return $this->warn($this->module->trans('Registro cancelado.', [], 'Modules.Waxap.Admin'));
     }
 
     /** Guarda la configuración del botón de email. */
@@ -382,5 +449,12 @@ final class Page
     private function warn(string $message): string
     {
         return '<div class="waxap-notice-warning">' . htmlspecialchars($message, ENT_QUOTES) . '</div>';
+    }
+
+    /** Aviso de error (rojo). */
+    private function error(string $message): string
+    {
+        return '<div class="wan-inline-notice wan-inline-notice--error" style="margin-bottom:18px;">'
+            . htmlspecialchars($message, ENT_QUOTES) . '</div>';
     }
 }

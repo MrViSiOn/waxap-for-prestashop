@@ -154,6 +154,121 @@ class AdminWaxapAjaxController extends ModuleAdminController
     }
 
     /* ===================================================================
+     *  ONBOARDING (DRAPPS-499)
+     * =================================================================== */
+
+    /** Registra una nueva cuenta de tienda en el wrapper. */
+    public function ajaxProcessRegister(): void
+    {
+        $email = trim((string) Tools::getValue('email'));
+        $password = (string) Tools::getValue('password');
+
+        if ('' === $email || !Validate::isEmail($email) || Tools::strlen($password) < 8) {
+            $this->err($this->l('Introduce un email válido y una contraseña de al menos 8 caracteres.'));
+        }
+
+        try {
+            $result = (new WrapperClient())->register($email, $password);
+            $tenantId = (string) ($result['tenantId'] ?? '');
+            $claimToken = (string) ($result['claimToken'] ?? '');
+            if ('' === $tenantId) {
+                $this->err($this->l('El servidor no devolvió un identificador de cuenta.'));
+            }
+            Config::set('TENANT_ID', $tenantId);
+            Config::set('CLAIM_TOKEN', $claimToken);
+            $this->ok(['tenantId' => $tenantId]);
+        } catch (WrapperException $e) {
+            $this->err($e->getMessage());
+        }
+    }
+
+    /** Devuelve la URL de checkout de Stripe para el plan seleccionado. */
+    public function ajaxProcessCheckoutUrl(): void
+    {
+        $tenantId = Config::get('TENANT_ID');
+        if ('' === $tenantId) {
+            $this->err($this->l('No hay cuenta registrada. Completa el paso anterior.'));
+        }
+
+        $allowed = ['basic', 'pro', 'lifetime'];
+        $plan = (string) Tools::getValue('plan');
+        if (!in_array($plan, $allowed, true)) {
+            $plan = 'basic';
+        }
+
+        $base = $this->context->link->getAdminLink('AdminModules', true, [], [
+            'configure' => 'waxap',
+            'tab' => 'connection',
+        ]);
+        $successUrl = $base . '&payment=success';
+        $cancelUrl = $base . '&payment=cancelled';
+
+        try {
+            $result = (new WrapperClient())->getCheckoutUrl($tenantId, $plan, $successUrl, $cancelUrl);
+            $url = (string) ($result['url'] ?? '');
+            if ('' === $url) {
+                $this->err($this->l('No se pudo obtener el enlace de pago. Contacta con soporte.'));
+            }
+            $this->ok(['url' => $url]);
+        } catch (WrapperException $e) {
+            $this->err($e->getMessage());
+        }
+    }
+
+    /** Consulta el estado de activación tras el pago y canjea las credenciales si procede. */
+    public function ajaxProcessPollActivation(): void
+    {
+        $tenantId = Config::get('TENANT_ID');
+        if ('' === $tenantId) {
+            $this->err($this->l('No hay cuenta registrada.'));
+        }
+
+        try {
+            $client = new WrapperClient();
+            $result = $client->getAuthStatus($tenantId);
+            $status = (string) ($result['status'] ?? 'pending_payment');
+
+            if ('active' === $status) {
+                $claimToken = Config::get('CLAIM_TOKEN');
+                if ('' !== $claimToken) {
+                    $credentials = $client->claimCredentials($tenantId, $claimToken);
+                    Config::set('API_KEY', (string) ($credentials['apiKey'] ?? ''));
+                    Config::set('HMAC_SECRET', (string) ($credentials['hmacSecret'] ?? ''));
+                    Config::set('CLAIM_TOKEN', '');
+                }
+            }
+
+            $this->ok(['status' => $status]);
+        } catch (WrapperException $e) {
+            $this->err($e->getMessage());
+        }
+    }
+
+    /* ===================================================================
+     *  BILLING (DRAPPS-500)
+     * =================================================================== */
+
+    /** Devuelve la URL del portal de cliente Stripe. */
+    public function ajaxProcessBillingPortal(): void
+    {
+        $returnUrl = $this->context->link->getAdminLink('AdminModules', true, [], [
+            'configure' => 'waxap',
+            'tab' => 'connection',
+        ]);
+
+        try {
+            $result = (new WrapperClient())->getBillingPortalUrl($returnUrl);
+            $url = (string) ($result['url'] ?? '');
+            if ('' === $url) {
+                $this->err($this->l('No se pudo obtener el enlace del portal.'));
+            }
+            $this->ok(['url' => $url]);
+        } catch (WrapperException $e) {
+            $this->err($e->getMessage());
+        }
+    }
+
+    /* ===================================================================
      *  RESPUESTAS JSON
      * =================================================================== */
 
