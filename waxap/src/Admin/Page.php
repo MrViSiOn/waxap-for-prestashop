@@ -72,7 +72,36 @@ final class Page
             $current = 'connection';
         }
 
+        $this->enqueueAssets($current);
+
         return $this->renderChassis($current, $notice);
+    }
+
+    /** Encola los scripts/estilos del back-office según la pestaña activa. */
+    private function enqueueAssets(string $current): void
+    {
+        $controller = $this->context->controller;
+        if (null === $controller) {
+            return;
+        }
+
+        $base = $this->module->getPathUri();
+        $ver = $this->module->version;
+        $controller->addCSS($base . 'views/css/admin.css?v=' . $ver);
+
+        $ajaxUrl = $this->context->link->getAdminLink('AdminWaxapAjax');
+
+        if ('phone' === $current) {
+            $controller->addJS($base . 'views/js/admin-session.js?v=' . $ver);
+            \Media::addJsDef([
+                'waxapSession' => [
+                    'ajaxUrl' => $ajaxUrl,
+                    'hasSession' => Config::hasSession() ? '1' : '0',
+                    'confirmUnlink' => $this->module->trans('¿Seguro que quieres desvincular el número WhatsApp?', [], 'Modules.Waxap.Admin'),
+                    'confirmDeleteSession' => $this->module->trans('¿Desvincular esta sesión? Se cerrará la conexión WhatsApp de este número.', [], 'Modules.Waxap.Admin'),
+                ],
+            ]);
+        }
     }
 
     /* ===================================================================
@@ -109,12 +138,51 @@ final class Page
     private function renderTab(string $tab): string
     {
         switch ($tab) {
+            case 'phone':
+                return $this->renderPhone();
             case 'notifications':
                 return $this->renderNotifications();
             case 'connection':
             default:
                 return $this->renderConnection();
         }
+    }
+
+    /** Pestaña Número WhatsApp: vinculación por QR, estado y mensaje de prueba. */
+    private function renderPhone(): string
+    {
+        $storedPhone = Config::get('PHONE_NUMBER');
+        $displayPhone = '' !== $storedPhone ? '+' . ltrim($storedPhone, '+') : '';
+
+        // Lista de sesiones (solo se muestra si hay más de una).
+        $sessions = [];
+        try {
+            $all = (new WrapperClient())->getSessions();
+            if (is_array($all) && count($all) >= 2) {
+                foreach ($all as $session) {
+                    $sid = (string) ($session['id'] ?? '');
+                    if ('' === $sid) {
+                        continue;
+                    }
+                    $phone = (string) ($session['phoneNumber'] ?? '');
+                    $sessions[] = [
+                        'id' => $sid,
+                        'phone' => '' !== $phone ? '+' . ltrim($phone, '+') : '—',
+                        'status' => (string) ($session['status'] ?? 'disconnected'),
+                    ];
+                }
+            }
+        } catch (WrapperException $e) {
+            $sessions = [];
+        }
+
+        $this->context->smarty->assign([
+            'waxap_has_session' => Config::hasSession(),
+            'waxap_display_phone' => $displayPhone,
+            'waxap_sessions' => $sessions,
+        ]);
+
+        return $this->fetch('tab-phone.tpl');
     }
 
     /** Pestaña Conexión: estado conectado o formulario de conexión manual. */
