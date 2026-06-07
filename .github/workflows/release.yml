@@ -1,13 +1,23 @@
 name: Release
 
 # Empaqueta el módulo como ZIP y lo adjunta a la GitHub Release al publicar un tag vX.Y.Z.
+#
 # El ZIP contiene la carpeta `waxap/` como raíz, que es exactamente lo que espera PrestaShop
-# y lo que descarga el auto-updater del módulo (src/Service/Updater.php).
+# (carpeta = nombre de clase) y lo que descarga y extrae el auto-updater del módulo
+# (src/Service/Updater.php → extractTo(_PS_MODULE_DIR_)).
+#
+# Flujo de publicación de una versión:
+#   1. Subir la versión en waxap/waxap.php ($this->version = 'X.Y.Z') y, si aplica, en config.xml.
+#   2. git tag vX.Y.Z && git push origin vX.Y.Z
+#   3. Este workflow valida que el tag == versión del módulo, construye waxap-X.Y.Z.zip y publica la Release.
+#
+# workflow_dispatch permite un build de prueba (sube el ZIP como artifact, sin crear Release).
 
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,15 +29,55 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build module ZIP (waxap/ como raíz)
+      - name: Resolver versión del módulo y validar coherencia con el tag
+        id: ver
         run: |
+          set -euo pipefail
+          # Versión declarada dentro del módulo
+          MODULE_VERSION="$(grep -oP "\$this->version\s*=\s*'\K[0-9]+\.[0-9]+\.[0-9]+" waxap/waxap.php | head -1)"
+          if [ -z "${MODULE_VERSION}" ]; then
+            echo "::error::No se pudo extraer \$this->version de waxap/waxap.php"
+            exit 1
+          fi
+          echo "module_version=${MODULE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Versión del módulo: ${MODULE_VERSION}"
+
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            echo "Tag: ${GITHUB_REF_NAME} (versión ${TAG_VERSION})"
+            if [ "${TAG_VERSION}" != "${MODULE_VERSION}" ]; then
+              echo "::error::El tag (${TAG_VERSION}) no coincide con \$this->version del módulo (${MODULE_VERSION}). Sincronízalos antes de etiquetar."
+              exit 1
+            fi
+          fi
+
+      - name: Empaquetar el módulo (waxap/ como raíz del ZIP)
+        run: |
+          set -euo pipefail
           mkdir -p dist
-          zip -r "dist/waxap.zip" waxap \
+          # Incluimos la licencia propietaria dentro del paquete distribuible.
+          cp LICENSE waxap/LICENSE || true
+          ZIP="dist/waxap-${{ steps.ver.outputs.module_version }}.zip"
+          zip -r "${ZIP}" waxap \
             -x 'waxap/vendor/*' \
             -x '*/node_modules/*' \
             -x '*.git*'
+          echo "Contenido del ZIP:"
+          unzip -l "${ZIP}" | head -20
+          # Verificación: el ZIP debe contener waxap/waxap.php en la raíz
+          unzip -l "${ZIP}" | grep -q 'waxap/waxap.php' || { echo "::error::El ZIP no contiene waxap/waxap.php"; exit 1; }
 
-      - name: Publish release asset
+      - name: Subir artifact (solo en ejecución manual)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: waxap-${{ steps.ver.outputs.module_version }}
+          path: dist/waxap-${{ steps.ver.outputs.module_version }}.zip
+
+      - name: Publicar la Release (solo al pushear un tag)
+        if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/waxap.zip
+          name: Waxap for PrestaShop ${{ steps.ver.outputs.module_version }}
+          files: dist/waxap-${{ steps.ver.outputs.module_version }}.zip
+          generate_release_notes: true
