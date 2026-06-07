@@ -36,7 +36,13 @@ if (is_file(__DIR__ . '/vendor/autoload.php')) {
 }
 
 use Waxap\Admin\Page;
+use Waxap\Api\WrapperClient;
+use Waxap\Api\WrapperException;
 use Waxap\Install\Installer;
+use Waxap\Service\Idempotency;
+use Waxap\Service\OptIn;
+use Waxap\Service\PhoneNormalizer;
+use Waxap\Service\TemplateRenderer;
 use Waxap\Settings\Config;
 
 /**
@@ -104,7 +110,91 @@ class Waxap extends Module
      */
     public function hookActionOrderStatusPostUpdate(array $params): void
     {
-        // Implementado en DRAPPS-495.
+        if (!Config::isConnected() || !Config::hasSession()) {
+            return;
+        }
+
+        $newState = $params['newOrderStatus'] ?? null;
+        $orderId = (int) ($params['id_order'] ?? 0);
+        if (!$newState instanceof OrderState || $orderId <= 0) {
+            return;
+        }
+
+        $stateId = (string) $newState->id;
+
+        // Filtro de estados a notificar. Lista vacía = notificar todos.
+        $enabled = array_filter(explode(',', Config::get('NOTIFY_STATUSES')));
+        if (!empty($enabled) && !in_array($stateId, $enabled, true)) {
+            return;
+        }
+
+        $order = new Order($orderId);
+        if (!Validate::isLoadedObject($order)) {
+            return;
+        }
+
+        // Teléfono del cliente (dirección de facturación, móvil preferente).
+        $address = new Address((int) $order->id_address_invoice);
+        $phone = PhoneNormalizer::fromAddress(Validate::isLoadedObject($address) ? $address : null);
+        if ('' === $phone) {
+            return;
+        }
+
+        // Consentimiento del cliente (default true para pedidos sin registro).
+        $optIn = OptIn::isOptedIn($orderId);
+
+        // Nombre del cliente.
+        $customer = new Customer((int) $order->id_customer);
+        $name = trim((string) $customer->firstname . ' ' . (string) $customer->lastname);
+        if ('' === $name) {
+            $name = 'Cliente';
+        }
+
+        // Nombre legible del estado en el idioma del pedido.
+        $localizedState = new OrderState($stateId, (int) $order->id_lang);
+        $stateLabel = is_array($localizedState->name)
+            ? (string) reset($localizedState->name)
+            : (string) $localizedState->name;
+
+        $payload = [
+            'orderId' => (string) $orderId,
+            'orderStatus' => $stateId,
+            'customerPhone' => $phone,
+            'customerName' => $name,
+            'whatsappOptIn' => $optIn,
+            'siteUrl' => $this->context->link->getBaseLink(),
+        ];
+
+        $message = TemplateRenderer::render($order, $stateId, $stateLabel);
+        if ('' !== $message) {
+            $payload['message'] = $message;
+        }
+
+        // Idempotencia: no reenviar si ya notificamos este estado para este pedido.
+        if (Idempotency::alreadyNotified($orderId, $stateId)) {
+            return;
+        }
+
+        try {
+            (new WrapperClient())->sendEvent($payload);
+            // Solo marcamos tras un envío correcto; un fallo permite reintento.
+            Idempotency::markNotified($orderId, $stateId);
+        } catch (WrapperException $e) {
+            // No silenciamos el fallo: dejamos traza en el log de PrestaShop.
+            \PrestaShopLogger::addLog(
+                sprintf(
+                    'Waxap: fallo al notificar el pedido #%1$d (estado "%2$s"): %3$s',
+                    $orderId,
+                    $stateId,
+                    $e->getMessage()
+                ),
+                3,
+                null,
+                'Order',
+                $orderId,
+                true
+            );
+        }
     }
 
     /**
