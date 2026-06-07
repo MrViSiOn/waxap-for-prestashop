@@ -65,7 +65,7 @@
                     <a class="btn btn-default" href="{$waxap_history_base_url|escape:'html':'UTF-8'}&paged=1">«</a>
                     <a class="btn btn-default" href="{$waxap_prev_url|escape:'html':'UTF-8'}">‹</a>
                 {/if}
-                <span style="font-size:13px;">{$waxap_page|intval} / {$waxap_total_pages|intval}</span>
+                <span style="font-size:13px;">{$waxap_page|string_format:"%d"} / {$waxap_total_pages|string_format:"%d"}</span>
                 {if $waxap_page < $waxap_total_pages}
                     <a class="btn btn-default" href="{$waxap_next_url|escape:'html':'UTF-8'}">›</a>
                     <a class="btn btn-default" href="{$waxap_last_url|escape:'html':'UTF-8'}">»</a>

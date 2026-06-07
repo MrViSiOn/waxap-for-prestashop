@@ -28,7 +28,7 @@
                             <div class="waxap-conv-preview">{$conv.preview|escape:'html':'UTF-8'}</div>
                         </div>
                         <div class="waxap-conv-meta">
-                            {if $conv.unread > 0}<span class="waxap-unread-badge">{$conv.unread|intval}</span>{/if}
+                            {if $conv.unread > 0}<span class="waxap-unread-badge">{$conv.unread|string_format:"%d"}</span>{/if}
                         </div>
                     </div>
                 {/foreach}

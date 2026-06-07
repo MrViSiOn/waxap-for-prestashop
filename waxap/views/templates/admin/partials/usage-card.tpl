@@ -21,7 +21,7 @@
         {l s='%used% / %quota% mensajes usados este mes' sprintf=['%used%' => $waxap_usage.used, '%quota%' => $waxap_usage.quota] d='Modules.Waxap.Admin'}
     </div>
     <div class="wan-usage-bar-track">
-        <div class="wan-usage-bar-fill" style="background:{if $waxap_usage.warning}#ef4444{else}#25d366{/if};width:{$waxap_usage.pct|intval}%;"></div>
+        <div class="wan-usage-bar-fill" style="background:{if $waxap_usage.warning}#ef4444{else}#25d366{/if};width:{$waxap_usage.pct|string_format:"%d"}%;"></div>
     </div>
 
     {if $waxap_usage.reset_label}
