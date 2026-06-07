@@ -338,9 +338,13 @@ class AdminWaxapAjaxController extends ModuleAdminController
     public function ajaxProcessApplyUpdate(): void
     {
         if (Updater::downloadAndInstall()) {
-            $this->ok();
+            // Redirige a la lista de módulos: ahí PrestaShop detecta la versión nueva en disco,
+            // ejecuta los scripts upgrade/ y actualiza la versión instalada en la BD.
+            $this->ok([
+                'redirect' => $this->context->link->getAdminLink('AdminModules'),
+            ]);
         } else {
-            $this->err($this->l('No se pudo descargar o aplicar la actualización. Inténtalo más tarde.'));
+            $this->err($this->l('No se pudo descargar o aplicar la actualización. Revisa los permisos de escritura en /modules e inténtalo de nuevo.'));
         }
     }
 

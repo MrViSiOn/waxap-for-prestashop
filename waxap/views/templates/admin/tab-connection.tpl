@@ -24,7 +24,7 @@
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ ajax: '1', action: 'ApplyUpdate' })
             }).then(function (r) { return r.json(); }).then(function (d) {
-                if (d.success) { window.location.reload(); }
+                if (d.success) { window.location = (d.data && d.data.redirect) ? d.data.redirect : window.location.href; }
                 else { window.alert((d.data && d.data.message) ? d.data.message : 'Error'); btn.disabled = false; btn.textContent = 'Actualizar ahora'; }
             }).catch(function () { window.alert('Error de conexión.'); btn.disabled = false; btn.textContent = 'Actualizar ahora'; });
         });

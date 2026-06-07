@@ -86,6 +86,11 @@ final class Updater
             return false;
         }
 
+        // El usuario del servidor web debe poder escribir en modules/ para extraer la actualización.
+        if (!is_writable(_PS_MODULE_DIR_)) {
+            return false;
+        }
+
         $tmp = tempnam(sys_get_temp_dir(), 'waxap_') ?: '';
         if ('' === $tmp) {
             return false;
@@ -117,7 +122,34 @@ final class Updater
         $zip->close();
         @unlink($tmp);
 
+        if ($ok) {
+            self::clearCaches();
+        }
+
         return $ok;
+    }
+
+    /**
+     * Limpia las cachés de PrestaShop tras aplicar la actualización, para que se carguen
+     * los archivos nuevos: Smarty, contenedor de Symfony e índice de clases del autoloader.
+     * Sin esto, las clases nuevas añadidas en una versión no se autoloadean hasta limpiar caché.
+     */
+    private static function clearCaches(): void
+    {
+        if (method_exists('Tools', 'clearCache')) {
+            \Tools::clearCache();
+        }
+        if (method_exists('Tools', 'clearSf2Cache')) {
+            try {
+                \Tools::clearSf2Cache();
+            } catch (\Throwable $e) {
+                // La limpieza de la caché de Symfony no es bloqueante; seguimos.
+            }
+        }
+        // Forzar regeneración del índice de clases para autoloadear ficheros nuevos.
+        if (defined('_PS_CACHE_DIR_') && is_file(_PS_CACHE_DIR_ . 'class_index.php')) {
+            @unlink(_PS_CACHE_DIR_ . 'class_index.php');
+        }
     }
 
     /**
