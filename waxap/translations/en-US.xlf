@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Waxap for PrestaShop — catálogo de traducción (inglés).
+  Source = es_ES (idioma fuente). Target = en.
+  @copyright Copyright (c) drappsinfo. Todos los derechos reservados.
+  @license   Propietaria — All rights reserved.
+-->
+<xliff version="1.2">
+  <file original="Modules.Waxap.Admin" source-language="es-ES" target-language="en-US" datatype="plaintext">
+    <body>
+      <trans-unit id="waxap.admin.subtitle">
+        <source>Notificaciones WhatsApp para PrestaShop</source>
+        <target>WhatsApp notifications for PrestaShop</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.tab.connection">
+        <source>Conexión</source>
+        <target>Connection</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.tab.phone">
+        <source>Número WhatsApp</source>
+        <target>WhatsApp number</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.tab.notifications">
+        <source>Notificaciones</source>
+        <target>Notifications</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.tab.email">
+        <source>Email</source>
+        <target>Email</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.tab.history">
+        <source>Historial</source>
+        <target>History</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.tab.messages">
+        <source>Mensajes</source>
+        <target>Messages</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.connected">
+        <source>Conectado</source>
+        <target>Connected</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.save">
+        <source>Guardar cambios</source>
+        <target>Save changes</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.disconnect">
+        <source>Desconectar cuenta</source>
+        <target>Disconnect account</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.link_whatsapp">
+        <source>Vincular WhatsApp</source>
+        <target>Link WhatsApp</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.unlink_number">
+        <source>Desvincular número</source>
+        <target>Unlink number</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.scan_qr">
+        <source>Escanea el QR con WhatsApp</source>
+        <target>Scan the QR with WhatsApp</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.test_message">
+        <source>Mensaje de prueba</source>
+        <target>Test message</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.send_test">
+        <source>Enviar mensaje de prueba</source>
+        <target>Send test message</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.notif.question">
+        <source>¿En qué momentos avisas a tus clientes?</source>
+        <target>When do you notify your customers?</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.country_prefix">
+        <source>Prefijo de país (teléfonos de clientes)</source>
+        <target>Country code (customer phone numbers)</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.email.button">
+        <source>Botón WhatsApp en emails</source>
+        <target>WhatsApp button in emails</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.email.button_text">
+        <source>Texto del botón</source>
+        <target>Button text</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.email.prefill">
+        <source>Mensaje prefabricado</source>
+        <target>Prefilled message</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.create_account">
+        <source>Crea tu cuenta Waxap</source>
+        <target>Create your Waxap account</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.choose_plan">
+        <source>Elige tu plan</source>
+        <target>Choose your plan</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.go_pay">
+        <source>Ir a pagar →</source>
+        <target>Go to payment →</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.account_activated">
+        <source>¡Cuenta activada! 🎉</source>
+        <target>Account activated! 🎉</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.manage_subscription">
+        <source>Gestionar suscripción →</source>
+        <target>Manage subscription →</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.history.title">
+        <source>Historial de mensajes WhatsApp</source>
+        <target>WhatsApp message history</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.messages.title">
+        <source>Mensajes</source>
+        <target>Messages</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.send">
+        <source>Enviar</source>
+        <target>Send</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.update.available">
+        <source>Nueva versión disponible: %v%</source>
+        <target>New version available: %v%</target>
+      </trans-unit>
+      <trans-unit id="waxap.admin.update.now">
+        <source>Actualizar ahora</source>
+        <target>Update now</target>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="Modules.Waxap.Shop" source-language="es-ES" target-language="en-US" datatype="plaintext">
+    <body>
+      <trans-unit id="waxap.shop.optin">
+        <source>Quiero recibir actualizaciones de mi pedido por WhatsApp</source>
+        <target>I want to receive updates about my order via WhatsApp</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
