@@ -269,6 +269,67 @@ class AdminWaxapAjaxController extends ModuleAdminController
     }
 
     /* ===================================================================
+     *  INBOX (DRAPPS-502)
+     * =================================================================== */
+
+    /** Lista de conversaciones (usada por el polling). */
+    public function ajaxProcessInboxConversations(): void
+    {
+        try {
+            $result = (new WrapperClient())->getInboxConversations(30);
+            $this->reply(true, is_array($result['data'] ?? null) ? $result['data'] : []);
+        } catch (WrapperException $e) {
+            $this->err($e->getMessage());
+        }
+    }
+
+    /** Hilo de mensajes con un número de teléfono. */
+    public function ajaxProcessInboxThread(): void
+    {
+        $phone = (string) Tools::getValue('phone');
+        if ('' === $phone) {
+            $this->err($this->l('Teléfono requerido.'));
+        }
+        try {
+            $result = (new WrapperClient())->getInboxThread($phone);
+            $this->reply(true, is_array($result['data'] ?? null) ? $result['data'] : []);
+        } catch (WrapperException $e) {
+            $this->err($e->getMessage());
+        }
+    }
+
+    /** Envía un mensaje WhatsApp desde el inbox. */
+    public function ajaxProcessInboxSend(): void
+    {
+        $phone = (string) Tools::getValue('phone');
+        $text = (string) Tools::getValue('text');
+        if ('' === $phone || '' === $text) {
+            $this->err($this->l('Teléfono y mensaje requeridos.'));
+        }
+        try {
+            (new WrapperClient())->sendInboxMessage($phone, $text);
+            $this->ok();
+        } catch (WrapperException $e) {
+            $this->err($e->getMessage());
+        }
+    }
+
+    /** Marca una conversación como leída. */
+    public function ajaxProcessInboxRead(): void
+    {
+        $phone = (string) Tools::getValue('phone');
+        if ('' === $phone) {
+            $this->err($this->l('Teléfono requerido.'));
+        }
+        try {
+            (new WrapperClient())->markInboxRead($phone);
+            $this->ok();
+        } catch (WrapperException $e) {
+            $this->err($e->getMessage());
+        }
+    }
+
+    /* ===================================================================
      *  RESPUESTAS JSON
      * =================================================================== */
 

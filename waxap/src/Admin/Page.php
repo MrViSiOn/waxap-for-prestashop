@@ -103,6 +103,14 @@ final class Page
             ]);
         }
 
+        // Inbox: solo en la pestaña Mensajes con cuenta conectada.
+        if ('messages' === $current && Config::isConnected()) {
+            $controller->addJS($base . 'views/js/admin-inbox.js?v=' . $ver);
+            \Media::addJsDef([
+                'waxapInbox' => ['ajaxUrl' => $ajaxUrl],
+            ]);
+        }
+
         // Wizard de onboarding: solo en la pestaña Conexión cuando no está conectado.
         if ('connection' === $current && !Config::isConnected()) {
             $controller->addJS($base . 'views/js/admin-onboarding.js?v=' . $ver);
@@ -158,6 +166,8 @@ final class Page
                 return $this->renderEmail();
             case 'history':
                 return $this->renderHistory();
+            case 'messages':
+                return $this->renderMessages();
             case 'connection':
             default:
                 return $this->renderConnection();
@@ -347,6 +357,41 @@ final class Page
         ]);
 
         return $this->fetch('tab-history.tpl');
+    }
+
+    /** Pestaña Mensajes: bandeja de entrada estilo WhatsApp Web. */
+    private function renderMessages(): string
+    {
+        $conversations = [];
+        $error = null;
+        try {
+            $result = (new WrapperClient())->getInboxConversations(30);
+            $raw = is_array($result['data'] ?? null) ? $result['data'] : [];
+            foreach ($raw as $conv) {
+                $phone = (string) ($conv['phone'] ?? '');
+                $last = is_array($conv['lastMessage'] ?? null) ? $conv['lastMessage'] : null;
+                $preview = $last ? (string) ($last['body'] ?? '') : '';
+                if (function_exists('mb_strlen') && mb_strlen($preview) > 45) {
+                    $preview = mb_substr($preview, 0, 45) . '…';
+                }
+                $conversations[] = [
+                    'phone' => $phone,
+                    'display' => '+' . preg_replace('/@[a-z.]+$/i', '', $phone),
+                    'preview' => '' !== $preview ? $preview : '—',
+                    'unread' => (int) ($conv['unreadCount'] ?? 0),
+                    'initial' => function_exists('mb_substr') ? mb_strtoupper(mb_substr($phone, 0, 1)) : strtoupper(substr($phone, 0, 1)),
+                ];
+            }
+        } catch (WrapperException $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->context->smarty->assign([
+            'waxap_conversations' => $conversations,
+            'waxap_inbox_error' => $error,
+        ]);
+
+        return $this->fetch('tab-messages.tpl');
     }
 
     /* ===================================================================
