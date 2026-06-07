@@ -1,0 +1,33 @@
+name: Release
+
+# Empaqueta el módulo como ZIP y lo adjunta a la GitHub Release al publicar un tag vX.Y.Z.
+# El ZIP contiene la carpeta `waxap/` como raíz, que es exactamente lo que espera PrestaShop
+# y lo que descarga el auto-updater del módulo (src/Service/Updater.php).
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build module ZIP (waxap/ como raíz)
+        run: |
+          mkdir -p dist
+          zip -r "dist/waxap.zip" waxap \
+            -x 'waxap/vendor/*' \
+            -x '*/node_modules/*' \
+            -x '*.git*'
+
+      - name: Publish release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/waxap.zip
