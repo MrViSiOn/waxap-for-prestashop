@@ -1,0 +1,246 @@
+/* ============================================================
+   Waxap — Estilos del back-office (PrestaShop 8)
+   Adaptado del admin.css de waxap-for-woocommerce manteniendo
+   la identidad visual (verde WhatsApp, tarjetas, toggles).
+   ============================================================ */
+
+.waxap-admin-wrap {
+    --wax-green:        #25d366;
+    --wax-green-dark:   #128c7e;
+    --wax-green-light:  #edfaf3;
+    --wax-green-border: #b5eace;
+    --wax-text:         #1d2327;
+    --wax-text-muted:   #6b7280;
+    --wax-border:       #e2e4e7;
+    --wax-bg:           #f6f7f7;
+    --wax-white:        #ffffff;
+    --wax-radius:       10px;
+    --wax-radius-sm:    6px;
+    --wax-shadow:       0 1px 4px rgba(0, 0, 0, 0.08);
+    max-width: 980px;
+    margin: 0 auto;
+    color: var(--wax-text);
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.waxap-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 0 18px;
+    border-bottom: 1px solid var(--wax-border);
+}
+.waxap-logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--wax-green);
+    border-radius: var(--wax-radius-sm);
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.35);
+}
+.waxap-header-text h1 { margin: 0; font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
+.waxap-header-text p { margin: 2px 0 0; color: var(--wax-text-muted); font-size: 0.8125rem; }
+
+/* ── Tabs ───────────────────────────────────────────────── */
+.waxap-nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--wax-border);
+}
+.waxap-nav-tabs a {
+    display: inline-block;
+    font-size: 0.8125rem;
+    padding: 9px 16px;
+    border-radius: var(--wax-radius-sm) var(--wax-radius-sm) 0 0;
+    color: var(--wax-text-muted);
+    text-decoration: none;
+    border: 1px solid transparent;
+    margin-bottom: -1px;
+}
+.waxap-nav-tabs a:hover { color: var(--wax-text); background: var(--wax-bg); }
+.waxap-nav-tabs a.active {
+    color: var(--wax-green-dark);
+    border-color: var(--wax-border) var(--wax-border) var(--wax-white);
+    background: var(--wax-white);
+    font-weight: 600;
+}
+
+/* ── Tab content ────────────────────────────────────────── */
+.waxap-tab-content {
+    background: var(--wax-white);
+    border: 1px solid var(--wax-border);
+    border-top: none;
+    border-radius: 0 0 var(--wax-radius) var(--wax-radius);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+}
+
+/* ── Section header ─────────────────────────────────────── */
+.waxap-section-header { margin-bottom: 24px; }
+.waxap-section-header h2 { margin: 0 0 6px; font-size: 1rem; font-weight: 700; }
+.waxap-section-header p { margin: 0; color: var(--wax-text-muted); font-size: 0.875rem; }
+
+/* ── Notices ────────────────────────────────────────────── */
+.waxap-updated, .waxap-notice-warning {
+    padding: 10px 14px;
+    border-radius: var(--wax-radius-sm);
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+.waxap-updated { background: var(--wax-green-light); border: 1px solid var(--wax-green-border); color: #0f5132; }
+.waxap-notice-warning { background: #fef3c7; border: 1px solid #fde68a; color: #92400e; }
+.wan-inline-notice { padding: 8px 12px; border-radius: var(--wax-radius-sm); font-size: 13px; }
+.wan-inline-notice--error { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; }
+.wan-inline-notice--warning { background: #fef3c7; border: 1px solid #fde68a; color: #92400e; }
+
+/* ── Connection badge ───────────────────────────────────── */
+.wan-connection-badge { display:inline-block; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:600; margin-left:8px; vertical-align:middle; }
+.wan-connection-badge--ok { background:#d1fae5; color:#065f46; }
+
+/* ── Fields ─────────────────────────────────────────────── */
+.wan-field-rows { display: flex; flex-direction: column; gap: 18px; }
+.wan-field-row { display: flex; flex-direction: column; gap: 6px; }
+.wan-field-label { font-weight: 600; font-size: 13px; color: var(--wax-text); }
+.wan-field-hint { display:block; font-weight: 400; font-size: 12px; color: var(--wax-text-muted); margin-top: 2px; }
+.wan-field-input {
+    padding: 8px 10px;
+    border: 1px solid var(--wax-border);
+    border-radius: var(--wax-radius-sm);
+    font-size: 13px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.wan-field-input:focus { border-color: var(--wax-green); outline: none; box-shadow: 0 0 0 1px var(--wax-green); }
+
+/* ── Buttons ────────────────────────────────────────────── */
+.waxap-btn-primary {
+    background: var(--wax-green) !important;
+    border-color: var(--wax-green-dark) !important;
+    color: #fff !important;
+}
+.waxap-btn-primary:hover { background: var(--wax-green-dark) !important; }
+.wan-action-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+.wan-btn-danger { background:#dc2626 !important; border-color:#b91c1c !important; color:#fff !important; }
+.wan-btn-outline-danger { color:#dc2626 !important; border-color:#fca5a5 !important; background:#fff !important; }
+
+/* ── Status list (notificaciones) ───────────────────────── */
+.wan-status-list { display: flex; flex-direction: column; gap: 12px; }
+.wan-status-item { border: 1px solid var(--wax-border); border-radius: var(--wax-radius-sm); overflow: hidden; }
+.wan-status-card-row { display: flex; align-items: stretch; }
+.wan-status-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    flex: 1;
+    cursor: pointer;
+    margin: 0;
+}
+.wan-status-dot-indicator { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.wan-status-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.wan-status-info strong { font-size: 13px; }
+.wan-status-info span { font-size: 12px; color: var(--wax-text-muted); }
+
+/* Toggle */
+.wan-toggle { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+.wan-toggle-input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2; }
+.wan-toggle-track { position: absolute; inset: 0; background: #cbd5e1; border-radius: 12px; transition: background .2s; }
+.wan-toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.wan-toggle-input:checked ~ .wan-toggle-track { background: var(--wax-green); }
+.wan-toggle-input:checked ~ .wan-toggle-thumb { transform: translateX(18px); }
+
+/* Edit-template pencil button */
+.wan-edit-tpl-btn {
+    border: none;
+    border-left: 1px solid var(--wax-border);
+    background: var(--wax-bg);
+    padding: 0 16px;
+    cursor: pointer;
+    color: var(--wax-text-muted);
+    display: flex;
+    align-items: center;
+}
+.wan-edit-tpl-btn:hover, .wan-edit-tpl-btn.is-active { color: var(--wax-green-dark); background: var(--wax-green-light); }
+
+/* Template panel */
+.wan-tpl-panel { display: none; border-top: 1px solid var(--wax-border); background: #fafafa; }
+.wan-tpl-panel.is-open { display: block; }
+.wan-tpl-panel-inner { padding: 14px 16px; }
+.wan-template-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--wax-border);
+    border-radius: var(--wax-radius-sm);
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+}
+.wan-template-textarea:focus { border-color: var(--wax-green); outline: none; box-shadow: 0 0 0 1px var(--wax-green); }
+.wan-template-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+.wan-var-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--wax-green-light);
+    border: 1px solid var(--wax-green-border);
+    border-radius: 10px;
+    font-size: 11px;
+    color: var(--wax-green-dark);
+    cursor: pointer;
+    font-family: monospace;
+}
+.wan-var-chip:hover { background: var(--wax-green-border); }
+.wan-char-count { margin-left: auto; font-size: 11px; color: #9ca3af; }
+
+/* ── Phone display / session status ─────────────────────── */
+.wan-phone-display { display:flex; align-items:center; gap:12px; padding:14px 16px; border:1px solid var(--wax-green-border); background:var(--wax-green-light); border-radius:var(--wax-radius-sm); margin-bottom:14px; }
+.wan-phone-display-icon { font-size:24px; }
+.wan-phone-display-label { display:block; font-size:11px; color:var(--wax-text-muted); }
+.wan-phone-display-number { font-size:16px; }
+.wan-session-status-card { display:flex; align-items:center; gap:10px; padding:12px 16px; border:1px solid var(--wax-border); border-radius:var(--wax-radius-sm); font-size:13px; }
+.wa-notifier-status-dot { width:10px; height:10px; border-radius:50%; background:#cbd5e1; display:inline-block; }
+.wa-notifier-status-dot.wan-green { background:var(--wax-green); }
+.wa-notifier-status-dot.wan-red { background:#ef4444; }
+.wa-notifier-status-dot.wan-yellow { background:#f59e0b; }
+.wa-notifier-spinner { display:none; }
+.wa-notifier-spinner.is-active { display:inline-block; width:16px; height:16px; border:2px solid #d1d5db; border-top-color:var(--wax-green); border-radius:50%; animation:waxap-spin .7s linear infinite; }
+@keyframes waxap-spin { to { transform: rotate(360deg); } }
+
+/* ── Usage card ─────────────────────────────────────────── */
+.wan-usage-card { margin-top:24px; padding:16px 20px; border:1px solid var(--wax-border); border-radius:var(--wax-radius-sm); }
+.wan-usage-bar-track { background:#e5e7eb; border-radius:4px; height:8px; overflow:hidden; }
+.wan-usage-bar-fill { height:100%; transition:width .3s; }
+
+/* ── Danger zone ────────────────────────────────────────── */
+.wan-danger-zone { margin-top:32px; padding:18px 20px; border:1px solid #fecaca; border-radius:var(--wax-radius-sm); background:#fef2f2; }
+.wan-danger-zone h3 { margin:0 0 6px; font-size:14px; color:#991b1b; }
+.wan-danger-zone p { margin:0 0 12px; font-size:13px; color:#7f1d1d; }
+
+/* ── Onboarding steps ───────────────────────────────────── */
+.wan-ob-steps-nav { display:flex; align-items:center; gap:6px; margin-bottom:28px; }
+.wan-ob-step-dot { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#e5e7eb; color:#6b7280; font-size:13px; font-weight:700; }
+.wan-ob-step-dot.active { background:var(--wax-green); color:#fff; }
+.wan-ob-step-dot.done { background:var(--wax-green-dark); color:#fff; }
+.wan-ob-step-line { flex:1; max-width:60px; height:2px; background:#e5e7eb; }
+.wan-plan-select-wrap { margin-bottom:16px; }
+.wan-plan-select { padding:8px 10px; border:1px solid var(--wax-border); border-radius:var(--wax-radius-sm); font-size:13px; min-width:380px; max-width:100%; }
+.wan-plan-desc-text { margin-top:8px; font-size:13px; color:var(--wax-text-muted); }
+
+/* ── QR modal ───────────────────────────────────────────── */
+#wa-notifier-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:100000; }
+.wa-notifier-modal-box { background:#fff; border-radius:var(--wax-radius); padding:28px 32px; max-width:380px; width:90%; text-align:center; position:relative; }
+.wa-notifier-modal-box h2 { margin:0 0 18px; font-size:16px; }
+#wa-notifier-modal-close { position:absolute; top:10px; right:14px; border:none; background:none; font-size:24px; cursor:pointer; color:#9ca3af; line-height:1; }
+#wa-notifier-qr-wrap { min-height:240px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+#wa-notifier-qr-img { max-width:240px; width:100%; }

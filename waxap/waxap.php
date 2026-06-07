@@ -35,6 +35,7 @@ if (is_file(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 
+use Waxap\Admin\Page;
 use Waxap\Install\Installer;
 use Waxap\Settings\Config;
 
@@ -86,16 +87,10 @@ class Waxap extends Module
         return parent::uninstall();
     }
 
-    /**
-     * Renderiza la página de configuración del módulo.
-     *
-     * El chasis de pestañas se implementa en DRAPPS-493.
-     */
+    /** Renderiza la página de configuración del módulo (chasis de pestañas). */
     public function getContent(): string
     {
-        return '<div class="alert alert-info">'
-            . $this->trans('Configuración de Waxap en construcción.', [], 'Modules.Waxap.Admin')
-            . '</div>';
+        return (new Page($this))->render();
     }
 
     /* ===================================================================
