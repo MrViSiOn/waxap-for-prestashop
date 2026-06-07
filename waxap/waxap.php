@@ -77,6 +77,18 @@ class Waxap extends Module
         );
     }
 
+    /**
+     * Traducción pública para las clases auxiliares del módulo (Page, etc.).
+     * Module::trans() es protected y no puede invocarse desde otro scope, así que
+     * estas clases enrutan sus traducciones por aquí (dominio Modules.Waxap.Admin).
+     *
+     * @param array<string,string> $parameters
+     */
+    public function l(string $id, array $parameters = []): string
+    {
+        return $this->trans($id, $parameters, 'Modules.Waxap.Admin');
+    }
+
     /** Instala el módulo: hooks, tablas, tabs ocultas y configuración por defecto. */
     public function install(): bool
     {

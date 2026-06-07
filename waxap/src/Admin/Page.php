@@ -98,8 +98,8 @@ final class Page
                 'waxapSession' => [
                     'ajaxUrl' => $ajaxUrl,
                     'hasSession' => Config::hasSession() ? '1' : '0',
-                    'confirmUnlink' => $this->module->trans('¿Seguro que quieres desvincular el número WhatsApp?', [], 'Modules.Waxap.Admin'),
-                    'confirmDeleteSession' => $this->module->trans('¿Desvincular esta sesión? Se cerrará la conexión WhatsApp de este número.', [], 'Modules.Waxap.Admin'),
+                    'confirmUnlink' => $this->module->l('¿Seguro que quieres desvincular el número WhatsApp?'),
+                    'confirmDeleteSession' => $this->module->l('¿Desvincular esta sesión? Se cerrará la conexión WhatsApp de este número.'),
                 ],
             ]);
         }
@@ -138,7 +138,7 @@ final class Page
             if ($isConnected || 'connection' === $slug) {
                 $visibleTabs[$slug] = [
                     'slug' => $slug,
-                    'label' => $this->module->trans($label, [], 'Modules.Waxap.Admin'),
+                    'label' => $this->module->l($label),
                     'url' => $this->tabUrl($slug),
                     'active' => $slug === $current,
                 ];
@@ -450,7 +450,7 @@ final class Page
         $password = (string) Tools::getValue('password');
 
         if ('' === $email || '' === $password) {
-            return $this->error($this->module->trans('Rellena todos los campos.', [], 'Modules.Waxap.Admin'));
+            return $this->error($this->module->l('Rellena todos los campos.'));
         }
 
         try {
@@ -459,7 +459,7 @@ final class Page
             Config::set('TENANT_ID', (string) ($result['tenantId'] ?? ''));
             Config::set('HMAC_SECRET', (string) ($result['hmacSecret'] ?? ''));
 
-            return $this->ok($this->module->trans('Sesión iniciada. Vincula ahora tu número WhatsApp.', [], 'Modules.Waxap.Admin'));
+            return $this->ok($this->module->l('Sesión iniciada. Vincula ahora tu número WhatsApp.'));
         } catch (WrapperException $e) {
             return $this->error($e->getMessage());
         }
@@ -471,7 +471,7 @@ final class Page
         Config::set('TENANT_ID', '');
         Config::set('CLAIM_TOKEN', '');
 
-        return $this->warn($this->module->trans('Registro cancelado.', [], 'Modules.Waxap.Admin'));
+        return $this->warn($this->module->l('Registro cancelado.'));
     }
 
     /** Guarda la configuración del botón de email. */
@@ -481,7 +481,7 @@ final class Page
         Config::set('EMAIL_BTN_TEXT', strip_tags((string) Tools::getValue('email_button_text')));
         Config::set('EMAIL_BTN_PREFILL', strip_tags((string) Tools::getValue('email_button_prefill')));
 
-        return $this->ok($this->module->trans('Configuración guardada.', [], 'Modules.Waxap.Admin'));
+        return $this->ok($this->module->l('Configuración guardada.'));
     }
 
     /** Guarda las credenciales de conexión introducidas manualmente. */
@@ -497,7 +497,7 @@ final class Page
         Config::set('API_KEY', $apiKey);
         Config::set('TENANT_ID', $tenantId);
 
-        return $this->ok($this->module->trans('Configuración guardada.', [], 'Modules.Waxap.Admin'));
+        return $this->ok($this->module->l('Configuración guardada.'));
     }
 
     /** Desconecta la cuenta borrando las credenciales. */
@@ -505,7 +505,7 @@ final class Page
     {
         Config::disconnect();
 
-        return $this->warn($this->module->trans('Cuenta desconectada.', [], 'Modules.Waxap.Admin'));
+        return $this->warn($this->module->l('Cuenta desconectada.'));
     }
 
     /** Guarda los estados de pedido a notificar, sus plantillas y el prefijo de país. */
@@ -543,7 +543,7 @@ final class Page
             }
         }
 
-        return $this->ok($this->module->trans('Configuración guardada.', [], 'Modules.Waxap.Admin'));
+        return $this->ok($this->module->l('Configuración guardada.'));
     }
 
     /* ===================================================================
