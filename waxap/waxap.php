@@ -56,7 +56,7 @@ class Waxap extends Module
     {
         $this->name = 'waxap';
         $this->tab = 'administration';
-        $this->version = '0.2.1';
+        $this->version = '0.2.2';
         $this->author = 'drappsinfo';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -267,7 +267,7 @@ class Waxap extends Module
 
         // Checkbox marcado por defecto. Un pequeño script sincroniza la preferencia en una
         // cookie que leemos en hookActionValidateOrder (el submit de pago no arrastra el campo).
-        return '<div class="waxap-checkout-consent" style="margin:14px 0;padding:12px 14px;'
+        $optIn = '<div class="waxap-checkout-consent" style="margin:14px 0;padding:12px 14px;'
             . 'border:1px solid #b5eace;background:#edfaf3;border-radius:6px;">'
             . '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;">'
             . '<input type="checkbox" id="waxap-opt-in" name="waxap_opt_in" value="1" checked>'
@@ -278,6 +278,9 @@ class Waxap extends Module
             . 'var c=document.getElementById("waxap-opt-in"); if(!c){return;} setC(c.checked?"1":"0");'
             . 'c.addEventListener("change",function(){setC(c.checked?"1":"0");});'
             . '})();</script>';
+
+        // Botón "Contáctanos" opcional en el checkout (DRAPPS-335). Sin número de pedido aún.
+        return $optIn . EmailButton::buildContact(null);
     }
 
     /**
@@ -301,6 +304,9 @@ class Waxap extends Module
     /**
      * Botón wa.me en la página de confirmación de pedido (DRAPPS-497).
      *
+     * Desde DRAPPS-335 se controla con el toggle propio CONTACT_BTN_ENABLED
+     * (independiente del botón de emails), para unificar el control con el checkout.
+     *
      * @param array<string,mixed> $params
      */
     public function hookDisplayOrderConfirmation(array $params): string
@@ -308,7 +314,7 @@ class Waxap extends Module
         $order = $params['order'] ?? ($params['objOrder'] ?? null);
         $orderNumber = ($order instanceof Order) ? (string) $order->reference : null;
 
-        return EmailButton::build($orderNumber);
+        return EmailButton::buildContact($orderNumber);
     }
 
     /**
