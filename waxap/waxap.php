@@ -56,7 +56,7 @@ class Waxap extends Module
     {
         $this->name = 'waxap';
         $this->tab = 'administration';
-        $this->version = '0.2.2';
+        $this->version = '0.2.3';
         $this->author = 'drappsinfo';
         $this->need_instance = 0;
         $this->bootstrap = true;
