@@ -54,6 +54,21 @@
         </div>
     </div>
 
+    <div class="wan-status-item" style="max-width:620px;margin-top:24px;">
+        <label class="wan-status-card" for="wan-contact-enabled">
+            <div class="wan-status-info">
+                <strong>{l s='Mostrar también en el checkout y la confirmación' d='Modules.Waxap.Admin'}</strong>
+                <span>{l s='Añade el mismo botón wa.me en el checkout y en la página de confirmación del pedido. Usa el texto y el mensaje configurados arriba.' d='Modules.Waxap.Admin'}</span>
+            </div>
+            <div class="wan-toggle">
+                <input type="checkbox" id="wan-contact-enabled" name="contact_button_enabled" value="1"
+                       class="wan-toggle-input" {if $waxap_contact_enabled}checked{/if}>
+                <span class="wan-toggle-track"></span>
+                <span class="wan-toggle-thumb"></span>
+            </div>
+        </label>
+    </div>
+
     <p class="wan-action-row">
         <button type="submit" name="submitWaxapEmail" class="btn btn-default waxap-btn-primary">
             {l s='Guardar cambios' d='Modules.Waxap.Admin'}

@@ -334,6 +334,7 @@ final class Page
             'waxap_email_enabled' => '1' === Config::get('EMAIL_BTN_ENABLED'),
             'waxap_email_text' => Config::get('EMAIL_BTN_TEXT'),
             'waxap_email_prefill' => Config::get('EMAIL_BTN_PREFILL'),
+            'waxap_contact_enabled' => '1' === Config::get('CONTACT_BTN_ENABLED'),
             'waxap_has_phone' => '' !== Config::get('PHONE_NUMBER'),
             'waxap_phone_tab_url' => $this->tabUrl('phone'),
             'waxap_config_url' => $this->configUrl(),
@@ -482,6 +483,7 @@ final class Page
         Config::set('EMAIL_BTN_ENABLED', Tools::getValue('email_button_enabled') ? '1' : '0');
         Config::set('EMAIL_BTN_TEXT', strip_tags((string) Tools::getValue('email_button_text')));
         Config::set('EMAIL_BTN_PREFILL', strip_tags((string) Tools::getValue('email_button_prefill')));
+        Config::set('CONTACT_BTN_ENABLED', Tools::getValue('contact_button_enabled') ? '1' : '0');
 
         return $this->ok($this->module->l10n('Configuración guardada.'));
     }

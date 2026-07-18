@@ -64,6 +64,42 @@ final class EmailButton
             return '';
         }
 
+        return self::renderHtml($orderNumber);
+    }
+
+    /**
+     * Construye el botón para el checkout y la confirmación de pedido (front).
+     *
+     * A diferencia de {@see build()}, se controla con su propio toggle
+     * (CONTACT_BTN_ENABLED) y exige conexión + sesión WhatsApp. Paridad con la
+     * clase ContactButton del plugin WooCommerce (DRAPPS-335).
+     *
+     * @param string|null $orderNumber Referencia/número de pedido para sustituir {pedido}.
+     *
+     * @return string HTML del botón, o cadena vacía si está desactivado o falta config.
+     */
+    public static function buildContact(?string $orderNumber): string
+    {
+        if ('1' !== Config::get('CONTACT_BTN_ENABLED')) {
+            return '';
+        }
+        if (!Config::isConnected() || !Config::hasSession()) {
+            return '';
+        }
+
+        return self::renderHtml($orderNumber);
+    }
+
+    /**
+     * Renderiza el HTML del botón wa.me (sin comprobar ningún toggle).
+     *
+     * @param string|null $orderNumber Referencia/número de pedido para sustituir {pedido};
+     *                                 null lo elimina del prefill.
+     *
+     * @return string HTML listo para imprimir, o cadena vacía si no hay número vinculado.
+     */
+    private static function renderHtml(?string $orderNumber): string
+    {
         $phone = Config::get('PHONE_NUMBER');
         if ('' === $phone) {
             return '';

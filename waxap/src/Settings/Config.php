@@ -51,6 +51,8 @@ final class Config
         'EMAIL_BTN_ENABLED'  => '1',
         'EMAIL_BTN_TEXT'     => '¿Tienes dudas? Escríbenos por WhatsApp',
         'EMAIL_BTN_PREFILL'  => 'Hola, tengo una consulta sobre mi pedido #{pedido}',
+        // Botón wa.me en checkout + confirmación de pedido (toggle independiente del email).
+        'CONTACT_BTN_ENABLED' => '0',
         // Plantilla genérica usada cuando un estado no tiene plantilla propia.
         'TPL_DEFAULT'        => '¡Hola {nombre}! Tu pedido #{pedido} ahora está: {estado}. 📦',
         // Repositorio de releases para el auto-updater (DRAPPS-505). Parametrizable.
