@@ -45,7 +45,6 @@ final class Page
         'notifications' => 'Notificaciones',
         'email' => 'Email',
         'history' => 'Historial',
-        'messages' => 'Mensajes',
     ];
 
     private Module $module;
@@ -169,8 +168,10 @@ final class Page
                 return $this->renderEmail();
             case 'history':
                 return $this->renderHistory();
-            case 'messages':
-                return $this->renderMessages();
+            // La pestaña "Mensajes" (bandeja) está oculta desde 0.2.3 (paridad con el
+            // plugin WooCommerce): el número entrante en crudo no casa con los contactos
+            // del comerciante y confunde. renderMessages()/tab-messages.tpl/InboxAjax se
+            // conservan por si se reactiva. ?tab=messages cae a la pestaña de conexión.
             case 'connection':
             default:
                 return $this->renderConnection();
