@@ -56,7 +56,7 @@ class Waxap extends Module
     {
         $this->name = 'waxap';
         $this->tab = 'administration';
-        $this->version = '0.2.0';
+        $this->version = '0.2.1';
         $this->author = 'drappsinfo';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -177,6 +177,7 @@ class Waxap extends Module
             'customerName' => $name,
             'whatsappOptIn' => $optIn,
             'siteUrl' => $this->context->link->getBaseLink(),
+            'platform' => 'prestashop',
         ];
 
         $message = TemplateRenderer::render($order, $stateId, $stateLabel);
